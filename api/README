@@ -1,0 +1,150 @@
+Events reporting API
+
+1. Intro
+  This API should be used whenever we need to get data about events tracked by the event tracker.
+  The API runs over the HTTP protocol and uses JSON to exchange messages.
+  The API is built with node.js and the express framework.
+
+2. Authentication
+  The node app server is meant to be listening on a private IP address, and any external access should
+  be done through a reverse proxy such as nginx. The file nginx_server.conf shows an example configuration
+  with one node process listening on 127.0.0.1:8099.
+
+  nginx takes care of the first part of the authentication by verifying the client SSL certificate for each
+  request. A valid certificate is required to access the API, because none of its functionalities are public.
+  Once nginx verifies the client certificate, the subject line of the certificate is passed to the node app
+  through the X-Client-Certificate header.
+
+  The node app uses an express middleware (lib/middleware/authenticator.js) to look for the X-Client-Certificate
+  header, and extract the Common Name from it which corresponds to the application name that was given access. If
+  the header is not present, it is assumed that we are in test mode (this can only happen if someone is connecting
+  from the private network).
+
+3. Authorization
+  authenticator.js also takes care of authorization. At the moment the API does not have an Access Control List,
+  so the only authorization is a full read/write per app and per project. The authenticator checks the table
+  applications_projects to see if an app has access to a project. There will either be one entry for the application
+  that has "ALL" for project (meaning the application has access to all projects current and future), or one entry
+  per project the application has access to.
+
+  If the application does not have access to the project it's requesting data for, a 401 Unauthorized HTTP code will
+  be sent to it. Otherwise, the authenticator.js will set the HTTP request's project_name to the requested project.
+
+4. Calls to the API
+  Calls to the API are made by accessing a certain resource (/events/summary, /events/stats, ...), and passing it
+  parameters thru a JSON object. The API calls are detailed below.
+
+5. Project API
+  The project API can be accessed thru the /project resource. The available actions are:
+
+  a. GET /project/info:
+     Required parameters: project
+     Output: an object with the project information, currently id, name and timezone
+
+  b. GET /project/timezones:
+     Required parameters: none
+     Output: an array of all the allowed timezones
+
+  c. POST /project/set_timezone:
+     Required parameters, project, timezone
+     Output: either OK or error
+
+6. Events API
+  The events API can be accessed thru the /events resource. The available actions are:
+
+  a. GET /events/summary
+     Required parameters: project, event
+     Output: an object with properties today, yesterday, last_7, last_30, mtd, itd. Each property's value is the
+             count of the number of times the event has happened over that period.
+
+  b. GET /events/custom
+     Required parameters: project, event
+     Output: an object where the properties are all the custom keys that have ever been set for that event, and
+             each property's value is an array of all the unique custom values for that key. For example:
+
+             {'$os' : ['Firefox', 'Chrome'], 'cohort' : ['Cohort #1', 'Cohort #2'], 'money_spent' : [1,2,10,50]}
+
+  c. GET /events/stats
+     Required parameters: project, options
+     Output: if options.compact == true, an object. if options.compact == false, an array of objects.
+     Options: here are all the possible options that can be passed. Everything is optional:
+
+     {
+       filters: {
+         date: ['yyyy-mm-dd', 'yyyy-mm-dd'],
+         events: ['event1', 'event2', ...],
+         custom: [{field: 'field name', op: =|<|<=|>|>=|in|null|notnull, values: [...]}, ...]
+       },
+       groups: ['group field 1', 'group field 2', ...],
+       compact: true|false
+     }
+
+     If filters.date is specified, it must be an array of two yyyy-mm-dd strings. The first one is the start date, and
+     the second one is the end date. start date's time is set to 00:00:01 and end date's time is set to 23:59:59, so
+     that using the same start and end date will result in that day's events only
+
+     If filters.events is specified, it must be an array of event names that we are getting stats for. Unless 'event' is
+     specified in the groups option (see below), then all events counts will be grouped together.
+
+     If filters.custom is specified, it must be an array of custom filters. A custom filter is an object that has
+     required properties field and op, and an optional property called values. values is only optional if the op
+     is set to "null" or "notnull". if the op is "in", then values can have as many elements as desired. If the op
+     is anything else, then values must have exactly one element.
+
+     If groups is specified, it must be an array of fields that we want the results grouped by. Apart from the custom
+     field names which can be anything, the following special values are accepted:
+
+        event: If we are selecting multiple events for statistics, it may be desirable to group the stats by event,
+               or not. If we want an aggregate over all the events, then we wouldn't add this to the groups option.
+
+        date.date: group the statistics by yyyy-mm-dd value
+        date.week: group the statistics by yyyy/Week # value
+        date.day: group the statistics by Monday, Tuesday, ...
+        date.month: group the statistics by yyyy/mm
+        date.hour: group the statistics by yyyy-mm-dd hh
+
+        anything else: will be taken as a custom field to group on.
+
+     The compact parameter is optional. If omitted it will default to false. If compact is false, then one record
+     will be returned for each different combination of group values. For instance if we are grouping by date.date
+     and by browser (custom field), then we will have the following output:
+
+     Without compact:
+     [
+       {"date.date" : "2012-03-01", "browser" : "Firefox", "stats_count" : 123, "stats_unique" : 10},
+       {"date.date" : "2012-03-01", "browser" : "Chrome", "stats_count" : 100, "stats_unique" : 5},
+       {"date.date" : "2012-03-02", "browser" : "Firefox", "stats_count" : 555, "stats_unique" : 50},
+       {"date.date" : "2012-03-02", "browser" : "Chrome", "stats_count" : 200, "stats_unique" : 15},
+       {"date.date" : "2012-03-02", "browser" : "Opera", "stats_count" : 10, "stats_unique" : 1}
+     ]
+
+     With compact, we will instead get a nested object for each unique value of our groups. The nesting order will
+     be the same as the order of the groups array. In this case:
+
+     With compact and groups = ["date.date", "browser"]:
+     {
+       "2012-03-01" : {
+         "Firefox" : {"stats_count" : 123, "stats_unique" : 10},
+         "Chrome" : {"stats_count: 100, "stats_unique" : 5}
+       },
+       "2012-03-02" : {
+         "Firefox" : {"stats_count" : 555, "stats_unique" : 50},
+         "Chrome" : {"stats_count" : 200, "stats_unique" : 15},
+         "Opera" : {"stats_count" : 10, "stats_unique" : 1},
+       }
+     }
+
+     With compact and groups = ["browser", "date.date"]:
+     {
+       "Firefox" : {
+         "2012-03-01" : {"stats_count" : 123, "stats_unique" : 10},
+         "2012-03-02" : {"stats_count" 555, "stats_unique" : 50}
+       },
+       "Chrome" : {
+         "2012-03-01" : {"stats_count" : 100, "stats_unique" : 5},
+         "2012-03-02" : {"stats_count" 200, "stats_unique" : 15}
+       },
+       "Opera" : {
+         "2012-03-02" : {"stats_count" 10, "stats_unique" : 1}
+       }
+     }

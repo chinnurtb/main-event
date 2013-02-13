@@ -1,0 +1,3 @@
+.git*
+.idea
+/conf/config-production.json

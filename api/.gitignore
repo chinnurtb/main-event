@@ -1,0 +1,6 @@
+.idea
+/config/production.js
+/node_modules
+/lib-cov
+/test/reports
+*.log

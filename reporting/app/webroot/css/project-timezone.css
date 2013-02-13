@@ -1,0 +1,13 @@
+.project-timezone-wrapper {
+  display: inline-block;
+}
+.project-timezone {
+  display: inline-block;
+  cursor: pointer;
+  padding: 3px;
+}
+.project-timezone:hover {
+  background-color: #ffc;
+  border-bottom: 2px solid #cc0;
+  padding-bottom: 1px;
+}

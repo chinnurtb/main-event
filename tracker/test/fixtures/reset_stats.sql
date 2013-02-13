@@ -1,0 +1,3 @@
+TRUNCATE TABLE `events_TESTING`;
+
+TRUNCATE TABLE `event_values_TESTING`;

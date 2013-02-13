@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD COLUMN `api_key` VARCHAR(40) UNIQUE, ADD COLUMN `api_secret` VARCHAR(40) UNIQUE;

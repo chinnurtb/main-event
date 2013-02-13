@@ -1,0 +1,182 @@
+body, html
+{
+	margin: 0px;
+	padding: 0px;
+    height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+
+#wrapper {
+    position:relative;
+    width: 100%;
+    min-height: 100%;
+}
+
+#header-leather
+{
+	background-image:url('img/header-leather.png');
+	height: 53px;
+	width: 100%;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 0px;
+	background-repeat: repeat-x;
+	position: absolute;
+	top: 0px;
+	z-index:-1;	
+}
+
+
+#header-linen
+{
+	background-image:url('img/header-linen.png');
+	height: 46px;
+	width: 100%;
+	margin-top: 53px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 0px;
+	background-repeat: repeat-x;
+	position: absolute;
+	top: 0px;
+	z-index:-2;
+}
+
+
+
+
+#logo
+{
+	background-image:url('img/logo.png');
+	width: 108px;
+	height: 21px;
+	float: left;
+	margin: auto;
+	top: 12px;
+	left: 20px;
+	
+}
+
+#container {
+    padding-bottom: 60px;
+}
+
+
+
+
+#main-logo
+{
+	background-image:url('img/main-logo.png');
+	width: 67px;
+	height: 67px;
+	position: absolute;
+	margin: auto;
+	bottom: 5px;
+	right: 10px;
+	
+}
+
+
+
+#powered-logo
+{
+	background-image:url('img/powered-logo.png');
+	width: 154px;
+	height: 25px;
+	position: absolute;
+	top: 8px;
+	right: 0px;
+	
+}
+
+#footer
+{
+	background-image:url('img/header-leather.png');
+	height: 40px;
+	width: 100%;
+	background-repeat: repeat-x;
+	position: absolute;
+    bottom: 0;
+}
+
+/** Tables **/
+table {
+    border-right:0;
+    clear: both;
+    color: #333;
+    margin-bottom: 10px;
+    width: 100%;
+}
+th {
+    border:0;
+    border-bottom:2px solid #555;
+    text-align: left;
+    padding:4px;
+}
+th a {
+    display: block;
+    padding: 2px 4px;
+    text-decoration: underline;
+    color: black;
+}
+th a.asc:after {
+    content: ' ⇣';
+}
+th a.desc:after {
+    content: ' ⇡';
+}
+table tr td {
+    padding: 6px;
+    vertical-align: top;
+    border-bottom:1px solid #ddd;
+}
+table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+td.actions {
+    text-align: center;
+    white-space: nowrap;
+}
+table td.actions a {
+    margin: 0px 6px;
+    padding:2px 5px;
+}
+table td.right, table th.right {
+    text-align: right;
+}
+
+
+/* Elements inside container */
+#container a {
+    color: #0088cc;
+    text-decoration: none;
+}
+
+#container a.btn {
+    color: #333;
+}
+
+
+/* Flash message */
+div#flashMessage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background:red;
+    width: 100%;
+    font-size: 24px;
+    padding: 15px 0;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+div#flashMessage.success {
+    background:green;
+}
+div.error-message {
+    color: red;
+}

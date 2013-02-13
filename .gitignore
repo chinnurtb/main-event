@@ -1,0 +1,10 @@
+tmp/*
+config/database.php
+app/tmp/*
+app/config/database.php
+api/config/config-*.js
+tracker/conf/config-*.json
+tracker/sql/*
+reporting/app/Config/database-*.php
+!empty
+.idea

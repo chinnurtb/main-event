@@ -1,0 +1,5 @@
+After adding the api_key and api_secret columns, you have to generate them for all existing projects.
+
+One way to quickly generate random SHA1 hex digests thru your shell is:
+
+# cat /dev/urandom|tr -cd 'a-f0-9'|fold -w40

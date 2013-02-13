@@ -1,0 +1,22 @@
+{
+  "name":"playerize-reporting-api",
+  "version":"0.1.0",
+  "author":"Ziad",
+  "dependencies":{
+    "express":"2.5.x",
+    "express-resource":"0.2.x",
+    "express-validator":"0.2.x",
+    "mysql":"0.9.x",
+    "step":"0.0.x",
+    "underscore":"1.3.x",
+    "node-uuid":"1.3.x",
+    "time":"0.8.x"
+  },
+  "devDependencies":{
+    "mocha":"1.0.x",
+    "should":"0.6.x"
+  },
+  "scripts":{
+    "test":"mocha --timeout 5000 --require should test/unit/*-tests.js"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "mysql" : {
+    "host" : "127.0.0.1",
+    "port" : 3306,
+    "user" : "root",
+    "password" : "",
+    "database" : "event"
+  },
+  "redis" : {
+    "host" : "127.0.0.1",
+    "port" : 6379,
+    "namespace" : "event-tracker"
+  },
+  "app" : {
+    "listen_port" : 8080
+  }
+}
